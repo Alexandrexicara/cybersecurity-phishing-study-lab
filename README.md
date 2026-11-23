@@ -4,12 +4,19 @@ Plataforma educacional em português para estudar cibersegurança pelo navegador
 
 ## Estado atual
 
-Primeira versão estática da interface, com:
+A interface existente foi preservada. O projeto inclui:
 - Painel inicial e trilhas de estudo.
 - Exercício fictício para identificar sinais de phishing.
 - Conteúdo introdutório de segurança web.
 - Cenário de conscientização com feedback.
 - Progresso local no navegador.
+- API Node.js com autenticação e persistência PostgreSQL (configuração por variáveis de ambiente).
+
+## Referência ao Zphisher original
+
+O projeto de referência [htr-tech/zphisher](https://github.com/htr-tech/zphisher) foi documentado em `modules/zphisher-reference/`. O registro técnico e os limites de compatibilidade estão em [docs/INTEGRACAO-ZPHISHER.md](docs/INTEGRACAO-ZPHISHER.md).
+
+**Importante:** o código operacional de páginas falsas de login, captura de credenciais e túneis de phishing não foi incorporado nem ativado. O Security Lab oferece exercícios defensivos e simulações fictícias, sem coletar senhas reais. A referência upstream é Bash/PHP para ambientes Linux/Termux; Netlify não executa Bash e a API Node.js no Render não é, por si só, um ambiente de execução compatível.
 
 ## Segurança e escopo
 
@@ -31,9 +38,7 @@ Não é necessário instalar Linux. Abra `index.html` no navegador ou use a opç
 
 ## Próximas etapas
 
-- API no Render para autenticação e dados de conta.
-- PostgreSQL no Neon para progresso sincronizado.
-- Mais módulos e relatórios.
+- Conectar os exercícios defensivos à API existente.
+- Sincronizar o progresso entre dispositivos pelo PostgreSQL.
+- Expandir os módulos de análise de URLs, conscientização e relatórios.
 - Ambientes de prática isolados e autorizados, sem acesso a alvos externos.
-
-A interface atual não depende de backend. O backend será integrado em uma etapa posterior.
