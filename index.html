@@ -43,6 +43,20 @@
     <button class="nav-item" data-view="awareness"><span>◉</span> Conscientização</button>
     <button class="nav-item" data-view="reports"><span>▤</span> Relatórios</button>
     <button class="nav-item" data-view="tools"><span>⌕</span> Ferramentas</button>
+    <button class="nav-item" data-view="recon"><span>⌬</span> Central de operações</button>
+
+    <section id="recon" class="view">
+      <div class="content-card"><p class="eyebrow">CENTRAL OPERACIONAL · FONTES PÚBLICAS</p><h2>Ferramentas de segurança</h2><p class="muted">Consultas reais em fontes públicas. Use somente domínios e sistemas que você tem autorização para avaliar.</p></div>
+      <div class="operation-grid">
+        <article class="content-card"><span class="module-tag">DNS / DOH</span><h3>Consulta avançada de DNS</h3><p class="muted">Registros A, AAAA, MX, NS, TXT, CAA e CNAME.</p><input id="op-dns-domain" class="tool-input" placeholder="exemplo.com"><button class="primary" id="op-dns-run">Consultar DNS</button><pre id="op-dns-result" class="operation-output"></pre></article>
+        <article class="content-card"><span class="module-tag">RDAP / WHOIS</span><h3>Registro do domínio</h3><p class="muted">Dados públicos de registro, datas e nameservers.</p><input id="op-rdap-domain" class="tool-input" placeholder="exemplo.com"><button class="primary" id="op-rdap-run">Consultar registro</button><pre id="op-rdap-result" class="operation-output"></pre></article>
+        <article class="content-card"><span class="module-tag">CERTIFICATE TRANSPARENCY</span><h3>Descoberta de subdomínios</h3><p class="muted">Certificados públicos emitidos para o domínio.</p><input id="op-ct-domain" class="tool-input" placeholder="exemplo.com"><button class="primary" id="op-ct-run">Pesquisar certificados</button><pre id="op-ct-result" class="operation-output"></pre></article>
+        <article class="content-card"><span class="module-tag">URL / REDIRECT</span><h3>Inspeção de endereço</h3><p class="muted">Inspeção estática de parâmetros e destino sem visitar a URL.</p><input id="op-url-value" class="tool-input" placeholder="https://exemplo.com/path?next=..."><button class="primary" id="op-url-run">Inspecionar URL</button><pre id="op-url-result" class="operation-output"></pre></article>
+        <article class="content-card"><span class="module-tag">TLS / HTTPS</span><h3>Teste de conexão HTTPS</h3><p class="muted">Tentativa de conexão pelo navegador. Não substitui auditoria completa do certificado.</p><input id="op-tls-domain" class="tool-input" placeholder="https://exemplo.com"><button class="primary" id="op-tls-run">Testar HTTPS</button><pre id="op-tls-result" class="operation-output"></pre></article>
+        <article class="content-card"><span class="module-tag">RELATÓRIOS</span><h3>Central de evidências</h3><p class="muted">Histórico de consultas salvas na conta.</p><button class="secondary" id="op-load-reports">Atualizar histórico</button><div id="op-reports-list" class="lesson-list"></div></article>
+      </div>
+      <div class="content-card"><p class="eyebrow">EXECUTOR CONTROLADO</p><h3>Auditorias avançadas</h3><p class="muted">Scanner HTTP de headers, identificação de tecnologias, varredura de portas e auditoria OWASP exigem executor backend/local com proteção SSRF, escopo autorizado e limites. Não vou apresentar essas funções como operacionais até o executor estar implantado e testado.</p></div>
+    </section>
     <div class="sidebar-bottom"><span class="status-dot"></span> Ambiente de treinamento seguro</div>
   </aside>
 
