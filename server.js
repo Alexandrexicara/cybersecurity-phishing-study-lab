@@ -1,6 +1,7 @@
 const express = require("express");
 const { Pool } = require("pg");
 const crypto = require("crypto");
+const dns = require("dns").promises;
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -313,6 +314,75 @@ app.put("/api/progress", requireAuth, async (req, res) => {
   } catch (error) {
     console.error("Progress write error:", error.message);
     res.status(500).json({ error: "Não foi possível salvar o progresso." });
+  }
+});
+
+
+function isPrivateIPv4(ip) {
+  const p = ip.split(".").map(Number);
+  if (p.length !== 4 || p.some(n => !Number.isInteger(n) || n < 0 || n > 255)) return true;
+  return p[0] === 10 || p[0] === 127 || p[0] === 0 ||
+    (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+    (p[0] === 192 && p[1] === 168) || p[0] >= 224;
+}
+function isPublicAddress(address) {
+  if (address.includes(":")) {
+    const value = address.toLowerCase();
+    return !(value === "::1" || value === "::" || value.startsWith("fc") ||
+      value.startsWith("fd") || value.startsWith("fe80:") || value.startsWith("::ffff:127.") ||
+      value.startsWith("::ffff:10.") || value.startsWith("::ffff:192.168."));
+  }
+  return !isPrivateIPv4(address);
+}
+app.post("/api/tools/domain-check", requireAuth, async (req, res) => {
+  const raw = String(req.body.domain || "").trim().toLowerCase();
+  const host = raw.replace(/^https?:\/\//, "").split(/[/?#]/)[0].replace(/:\d+$/, "");
+  if (!host || host.length > 253 || !/^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(host) ||
+      host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) {
+    return res.status(400).json({ error: "Informe um domínio público válido, sem caminho ou endereço local." });
+  }
+  try {
+    const records = await dns.lookup(host, { all: true, verbatim: true });
+    const addresses = [...new Set(records.map(record => record.address))];
+    const privateAnswers = addresses.filter(address => !isPublicAddress(address));
+    res.json({
+      domain: host,
+      resolved: addresses.length > 0,
+      addresses,
+      warnings: privateAnswers.length ? ["O DNS retornou endereço privado ou reservado; não use esse domínio como destino público."] : [],
+      checkedAt: new Date().toISOString(),
+      note: "Consulta DNS somente. O servidor não abriu o site, não seguiu redirecionamentos e não enviou formulários."
+    });
+  } catch (error) {
+    res.status(404).json({ domain: host, resolved: false, addresses: [], warnings: ["O domínio não resolveu no DNS ou não possui registro acessível."], checkedAt: new Date().toISOString() });
+  }
+});
+app.post("/api/reports", requireAuth, async (req, res) => {
+  const title = String(req.body.title || "").trim().slice(0, 120);
+  const kind = String(req.body.kind || "security-check").slice(0, 40);
+  const details = req.body.details && typeof req.body.details === "object" ? req.body.details : {};
+  if (!title) return res.status(400).json({ error: "Informe um título para o relatório." });
+  try {
+    const result = await pool.query(
+      "INSERT INTO security_lab_reports (user_id, kind, title, details) VALUES ($1,$2,$3,$4::jsonb) RETURNING id, kind, title, details, created_at",
+      [req.auth.id, kind, title, JSON.stringify(details)]
+    );
+    res.status(201).json({ report: result.rows[0] });
+  } catch (error) {
+    console.error("Report save error:", error.message);
+    res.status(500).json({ error: "Não foi possível salvar o relatório. Verifique se a migração de relatórios foi aplicada." });
+  }
+});
+app.get("/api/reports", requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, kind, title, details, created_at FROM security_lab_reports WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50",
+      [req.auth.id]
+    );
+    res.json({ reports: result.rows });
+  } catch (error) {
+    console.error("Report list error:", error.message);
+    res.status(500).json({ error: "Não foi possível carregar relatórios." });
   }
 });
 
