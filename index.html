@@ -42,6 +42,7 @@
     <button class="nav-item" data-view="web"><span>⌘</span> Segurança web</button>
     <button class="nav-item" data-view="awareness"><span>◉</span> Conscientização</button>
     <button class="nav-item" data-view="reports"><span>▤</span> Relatórios</button>
+    <button class="nav-item" data-view="tools"><span>⌕</span> Ferramentas</button>
     <div class="sidebar-bottom"><span class="status-dot"></span> Ambiente de treinamento seguro</div>
   </aside>
 
@@ -101,6 +102,30 @@
     <section id="awareness" class="view"><div class="content-card"><p class="eyebrow">MÓDULO 03 · CENÁRIOS FICTÍCIOS</p><h2>Treino de tomada de decisão</h2><p class="muted">Você recebe uma mensagem inesperada dizendo que uma entrega está retida e pede confirmação imediata.</p><div class="scenario"><h3>Qual é a atitude mais segura?</h3><button class="scenario-option" data-correct="false">Clicar no primeiro link para resolver rapidamente.</button><button class="scenario-option" data-correct="true">Acessar o aplicativo ou site oficial digitando o endereço conhecido.</button><button class="scenario-option" data-correct="false">Responder a mensagem enviando seus dados.</button><p id="scenario-feedback" class="feedback" aria-live="polite"></p></div></div></section>
 
     <section id="reports" class="view"><div class="content-card"><p class="eyebrow">MÓDULO 04 · SEU PORTFÓLIO</p><h2>Relatórios de estudo</h2><p class="muted">O progresso dos exercícios é sincronizado com o banco de dados quando a API está disponível. <span id="sync-status" role="status">Conectando ao banco de dados...</span></p><div class="report-empty"><span>▤</span><b>Nenhum relatório criado</b><p>Conclua os exercícios para começar seu registro de aprendizagem.</p></div></div></section>
+
+    <section id="tools" class="view">
+      <div class="content-card">
+        <p class="eyebrow">FERRAMENTA OPERACIONAL · ANÁLISE LOCAL</p>
+        <h2>Analisador de URLs suspeitas</h2>
+        <p class="muted">A análise acontece no seu navegador. O endereço informado não é aberto, visitado nem enviado ao servidor.</p>
+        <label class="tool-label" for="url-to-check">URL para analisar</label>
+        <input id="url-to-check" class="tool-input" type="text" inputmode="url" autocomplete="off" placeholder="https://exemplo.com/login">
+        <div class="tool-actions"><button class="primary" id="run-url-check">Analisar endereço</button><button class="secondary" id="clear-url-check">Limpar</button></div>
+        <p id="url-check-feedback" class="feedback" role="status" aria-live="polite"></p>
+        <div id="url-check-result" class="url-result" hidden></div>
+      </div>
+      <div class="content-card">
+        <p class="eyebrow">AMBIENTE WINDOWS</p>
+        <h2>Como usar no Windows</h2>
+        <p>O painel continua sendo acessado pelo navegador do Windows. Para ferramentas de linha de comando compatíveis com Linux, o Windows pode usar WSL2 sem substituir o Windows nem instalar outro sistema como principal.</p>
+        <div class="lesson-list">
+          <article><b>1. Verifique o WSL</b><p>Abra o PowerShell como administrador e execute <code>wsl --status</code>.</p></article>
+          <article><b>2. Instale o ambiente, se necessário</b><p>Execute <code>wsl --install -d Ubuntu</code> e reinicie o computador se o Windows solicitar.</p></article>
+          <article><b>3. Abra o Ubuntu</b><p>Conclua a criação do usuário Linux dentro do terminal Ubuntu. Isso é apenas um ambiente de compatibilidade dentro do Windows.</p></article>
+        </div>
+        <p class="muted">O WSL2 não é necessário para usar as ferramentas que rodam diretamente no painel web. Ele é uma opção para utilitários locais compatíveis. O painel atual ainda não possui uma ponte local para executar comandos do computador.</p>
+      </div>
+    </section>
 
     <footer>CYBERLAB · Plataforma educacional · Use somente ambientes e sistemas autorizados.</footer>
   </main>
