@@ -1,0 +1,11 @@
+const views = [...document.querySelectorAll(".view")];
+const navItems = [...document.querySelectorAll(".nav-item")];
+const titles = {overview:"Visão geral",phishing:"Análise de phishing",web:"Segurança web",awareness:"Conscientização",reports:"Relatórios"};
+let completed = JSON.parse(localStorage.getItem("cyberlab-progress") || "[]");
+function updateProgress(){const value=Math.round(completed.length/2*100);document.getElementById("progress-number").textContent=Math.min(value,100)+"%";}
+function showView(name){views.forEach(v=>v.classList.toggle("active-view",v.id===name));navItems.forEach(b=>b.classList.toggle("active",b.dataset.view===name));document.getElementById("page-title").textContent=titles[name]||"Visão geral";window.scrollTo({top:0,behavior:"smooth"});}
+navItems.forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.go)));
+document.getElementById("check-phishing").addEventListener("click",()=>{const selected=[...document.querySelectorAll("#phishing-choices input:checked")].map(i=>i.value).sort();const expected=["request","sender","urgency"];const ok=JSON.stringify(selected)===JSON.stringify(expected);const feedback=document.getElementById("phishing-feedback");feedback.textContent=ok?"Correto! Você identificou os três sinais de alerta.":"Revise: remetente incomum, urgência e solicitação inesperada são sinais de alerta.";if(ok&&!completed.includes("phishing")){completed.push("phishing");localStorage.setItem("cyberlab-progress",JSON.stringify(completed));updateProgress();}});
+document.querySelectorAll(".scenario-option").forEach(b=>b.addEventListener("click",()=>{const feedback=document.getElementById("scenario-feedback");const correct=b.dataset.correct==="true";feedback.textContent=correct?"Boa decisão! Use sempre canais oficiais que você já conhece.":"Não é a opção mais segura. Evite links inesperados e procure o canal oficial.";if(correct&&!completed.includes("awareness")){completed.push("awareness");localStorage.setItem("cyberlab-progress",JSON.stringify(completed));updateProgress();}}));
+updateProgress();
