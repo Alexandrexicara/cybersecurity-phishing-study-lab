@@ -10,6 +10,28 @@
   <script src="./app.js" defer></script>
 </head>
 <body>
+  <section id="auth-gate" class="auth-gate">
+    <div class="auth-panel">
+      <div class="auth-brand"><span class="brand-mark">◈</span><span>CYBER<span class="accent">LAB</span></span></div>
+      <p class="eyebrow">ACESSO PRIVADO</p>
+      <h1>Entre no seu laboratório</h1>
+      <p class="auth-intro">Use seu e-mail autorizado e sua senha. No primeiro acesso, gere os dois links de confirmação.</p>
+      <label for="auth-email">E-mail</label>
+      <input id="auth-email" type="email" autocomplete="username" placeholder="Seu e-mail autorizado" required>
+      <label for="auth-password">Senha</label>
+      <input id="auth-password" type="password" autocomplete="current-password" minlength="10" placeholder="Mínimo de 10 caracteres" required>
+      <div class="auth-buttons">
+        <button id="auth-login" class="primary">ENTRAR</button>
+        <button id="auth-request" class="secondary">ENVIAR CONFIRMAÇÃO</button>
+      </div>
+      <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
+      <div id="auth-link-actions" class="auth-link-actions" hidden>
+        <a id="auth-whatsapp-link" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a>
+        <a id="auth-email-link">Abrir e-mail</a>
+      </div>
+      <p class="auth-note">Os links expiram em 30 minutos. O primeiro canal confirmado libera o acesso e invalida o outro. O envio das mensagens precisa ser concluído no aplicativo aberto.</p>
+    </div>
+  </section>
   <aside class="sidebar">
     <a class="brand" href="#" aria-label="Cybersecurity Study Lab">
       <span class="brand-mark">◈</span><span>CYBER<span class="accent">LAB</span></span>
@@ -26,7 +48,7 @@
   <main class="main">
     <header class="topbar">
       <div><p class="eyebrow">CENTRO DE TREINAMENTO</p><h1 id="page-title">Visão geral</h1></div>
-      <div class="user-chip"><span class="avatar">CS</span><span>Estudante</span></div>
+      <div class="user-chip"><span class="avatar">CS</span><span id="signed-in-email">Estudante</span><button id="auth-logout" class="logout-button">Sair</button></div>
     </header>
 
     <section id="overview" class="view active-view">
