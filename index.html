@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="Plataforma de estudos de cibersegurança e conscientização contra phishing.">
+  <title>Cybersecurity Study Lab</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="Cybersecurity Study Lab">
+      <span class="brand-mark">◈</span><span>CYBER<span class="accent">LAB</span></span>
+    </a>
+    <p class="nav-label">ÁREA DE ESTUDOS</p>
+    <button class="nav-item active" data-view="overview"><span>⌂</span> Visão geral</button>
+    <button class="nav-item" data-view="phishing"><span>✉</span> Análise de phishing</button>
+    <button class="nav-item" data-view="web"><span>⌘</span> Segurança web</button>
+    <button class="nav-item" data-view="awareness"><span>◉</span> Conscientização</button>
+    <button class="nav-item" data-view="reports"><span>▤</span> Relatórios</button>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Ambiente de treinamento seguro</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><p class="eyebrow">CENTRO DE TREINAMENTO</p><h1 id="page-title">Visão geral</h1></div>
+      <div class="user-chip"><span class="avatar">CS</span><span>Estudante</span></div>
+    </header>
+
+    <section id="overview" class="view active-view">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">BEM-VINDO AO SEU LABORATÓRIO</p>
+          <h2>Aprenda a identificar.<br><span class="accent">Entenda como proteger.</span></h2>
+          <p>Treinamento prático de cibersegurança, com exercícios fictícios e foco em defesa digital.</p>
+          <button class="primary" data-go="phishing">Começar primeiro exercício <span>→</span></button>
+        </div>
+        <div class="hero-art" aria-hidden="true"><div class="shield">⬡<span>✓</span></div><i class="orbit orbit-one"></i><i class="orbit orbit-two"></i></div>
+      </div>
+      <div class="stats">
+        <article class="stat-card"><span class="stat-icon">▣</span><p>MÓDULOS</p><strong>4</strong><small>Trilhas disponíveis</small></article>
+        <article class="stat-card"><span class="stat-icon">✓</span><p>PROGRESSO</p><strong id="progress-number">0%</strong><small>Continue seus estudos</small></article>
+        <article class="stat-card"><span class="stat-icon">◷</span><p>AMBIENTE</p><strong>Seguro</strong><small>Dados fictícios</small></article>
+      </div>
+      <div class="section-heading"><div><p class="eyebrow">SUA TRILHA</p><h2>Módulos de treinamento</h2></div></div>
+      <div class="module-grid">
+        <button class="module-card" data-go="phishing"><span class="module-icon">✉</span><span class="module-tag">INICIANTE</span><h3>Análise de phishing</h3><p>Aprenda a reconhecer mensagens, links e sinais suspeitos.</p><span class="module-link">Abrir módulo →</span></button>
+        <button class="module-card" data-go="web"><span class="module-icon">⌘</span><span class="module-tag">FUNDAMENTOS</span><h3>Segurança web</h3><p>Conheça HTTPS, autenticação, sessões e boas práticas.</p><span class="module-link">Abrir módulo →</span></button>
+        <button class="module-card" data-go="awareness"><span class="module-icon">◉</span><span class="module-tag">PRÁTICA</span><h3>Conscientização</h3><p>Treine decisões seguras com cenários inteiramente fictícios.</p><span class="module-link">Abrir módulo →</span></button>
+        <button class="module-card" data-go="reports"><span class="module-icon">▤</span><span class="module-tag">PORTFÓLIO</span><h3>Relatórios</h3><p>Registre aprendizados e organize suas análises defensivas.</p><span class="module-link">Abrir módulo →</span></button>
+      </div>
+    </section>
+
+    <section id="phishing" class="view">
+      <div class="content-card">
+        <p class="eyebrow">MÓDULO 01 · ANÁLISE DEFENSIVA</p><h2>Você consegue identificar os sinais?</h2>
+        <p class="muted">Leia o exemplo fictício abaixo. Não abra links externos nem informe dados pessoais em exercícios.</p>
+        <div class="email-sample">
+          <div class="email-row"><b>De:</b> suporte-conta@exemplo-ficticio.invalid</div>
+          <div class="email-row"><b>Assunto:</b> Ação necessária: verifique sua conta</div>
+          <div class="email-body">Olá! Detectamos uma atividade incomum. Para este exercício, observe o endereço do remetente, a urgência da mensagem e a solicitação inesperada. Nenhum link real está incluído nesta simulação.</div>
+        </div>
+        <h3>Quais sinais merecem atenção?</h3>
+        <div class="choices" id="phishing-choices">
+          <label><input type="checkbox" value="sender"> Endereço do remetente incomum</label>
+          <label><input type="checkbox" value="urgency"> Linguagem de urgência ou pressão</label>
+          <label><input type="checkbox" value="request"> Solicitação inesperada de ação</label>
+          <label><input type="checkbox" value="safe"> A mensagem é confiável só porque usa a palavra “suporte”</label>
+        </div>
+        <button class="primary" id="check-phishing">Verificar respostas</button>
+        <p id="phishing-feedback" class="feedback" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="web" class="view"><div class="content-card"><p class="eyebrow">MÓDULO 02 · FUNDAMENTOS</p><h2>Segurança web</h2><div class="lesson-list"><article><b>HTTPS e TLS</b><p>Entenda o que a conexão criptografada protege e o que ela não garante sobre a honestidade de um site.</p></article><article><b>Autenticação multifator</b><p>Aprenda por que uma segunda etapa de verificação reduz o risco de acesso indevido.</p></article><article><b>Senhas e gerenciadores</b><p>Use senhas únicas, longas e um gerenciador confiável. Nunca reutilize senhas em exercícios.</p></article><article><b>Sessões e cookies</b><p>Conheça a função dos cookies de sessão e por que sites devem protegê-los adequadamente.</p></article></div></div></section>
+
+    <section id="awareness" class="view"><div class="content-card"><p class="eyebrow">MÓDULO 03 · CENÁRIOS FICTÍCIOS</p><h2>Treino de tomada de decisão</h2><p class="muted">Você recebe uma mensagem inesperada dizendo que uma entrega está retida e pede confirmação imediata.</p><div class="scenario"><h3>Qual é a atitude mais segura?</h3><button class="scenario-option" data-correct="false">Clicar no primeiro link para resolver rapidamente.</button><button class="scenario-option" data-correct="true">Acessar o aplicativo ou site oficial digitando o endereço conhecido.</button><button class="scenario-option" data-correct="false">Responder a mensagem enviando seus dados.</button><p id="scenario-feedback" class="feedback" aria-live="polite"></p></div></div></section>
+
+    <section id="reports" class="view"><div class="content-card"><p class="eyebrow">MÓDULO 04 · SEU PORTFÓLIO</p><h2>Relatórios de estudo</h2><p class="muted">Esta primeira versão registra apenas o progresso neste navegador. Salvamento em conta e sincronização serão adicionados na etapa de backend.</p><div class="report-empty"><span>▤</span><b>Nenhum relatório criado</b><p>Conclua os exercícios para começar seu registro de aprendizagem.</p></div></div></section>
+
+    <footer>CYBERLAB · Plataforma educacional · Use somente ambientes e sistemas autorizados.</footer>
+  </main>
+</body>
+</html>
