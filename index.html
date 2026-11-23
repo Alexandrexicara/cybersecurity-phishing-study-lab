@@ -115,6 +115,23 @@
         <div id="url-check-result" class="url-result" hidden></div>
       </div>
       <div class="content-card">
+        <p class="eyebrow">CONSULTA DNS · SERVIDOR</p>
+        <h2>Verificação de domínio</h2>
+        <p class="muted">Consulta os registros DNS públicos do domínio. Não acessa páginas nem envia dados ao site.</p>
+        <label class="tool-label" for="domain-to-check">Domínio</label>
+        <input id="domain-to-check" class="tool-input" placeholder="exemplo.com" autocomplete="off">
+        <div class="tool-actions"><button class="primary" id="run-domain-check">Consultar DNS</button></div>
+        <p id="domain-check-feedback" class="feedback" role="status" aria-live="polite"></p>
+        <div id="domain-check-result" class="url-result" hidden></div>
+      </div>
+      <div class="content-card">
+        <p class="eyebrow">HISTÓRICO PERSISTENTE · POSTGRESQL</p>
+        <h2>Relatórios salvos</h2>
+        <p class="muted">Resultados salvos na sua conta, disponíveis após sair e entrar novamente.</p>
+        <div class="tool-actions"><button class="secondary" id="load-security-reports">Carregar relatórios</button></div>
+        <div id="security-reports-list" class="lesson-list"></div>
+      </div>
+      <div class="content-card">
         <p class="eyebrow">AMBIENTE WINDOWS</p>
         <h2>Como usar no Windows</h2>
         <p>O painel continua sendo acessado pelo navegador do Windows. Para ferramentas de linha de comando compatíveis com Linux, o Windows pode usar WSL2 sem substituir o Windows nem instalar outro sistema como principal.</p>
