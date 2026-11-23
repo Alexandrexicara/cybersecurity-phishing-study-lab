@@ -23,3 +23,14 @@
 .logout-button{border:1px solid #344b63;background:transparent;color:#aebdd0;border-radius:7px;padding:7px 10px;font-size:11px;cursor:pointer}
 body:not(.authenticated) .sidebar,body:not(.authenticated) .main{display:none}
 @media(max-width:520px){.auth-panel{padding:25px 20px}.auth-panel h1{font-size:24px}.auth-buttons{grid-template-columns:1fr}.auth-buttons button{width:100%}}
+
+/* Operational URL analysis tool */
+.tool-label{display:block;color:#d5e0ed;font-size:12px;font-weight:700;margin:20px 0 8px}
+.tool-input{width:100%;padding:13px 14px;border:1px solid #344b63;border-radius:8px;background:#091727;color:#eef5ff;font:inherit;font-size:14px}
+.tool-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.tool-actions .primary,.tool-actions .secondary{margin:0}
+.url-result{margin-top:20px;padding:18px;border:1px solid #34536a;border-radius:10px;background:#0b1b2c}
+.url-result h3{color:var(--cyan);margin:0 0 10px}
+.url-result p,.url-result li{font-size:13px;line-height:1.65;color:#c5d2e1}
+.url-result ul{padding-left:20px}
+.url-result[hidden]{display:none}
