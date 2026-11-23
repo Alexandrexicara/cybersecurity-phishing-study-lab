@@ -84,6 +84,7 @@ document.getElementById("auth-request").addEventListener("click", async () => {
   button.disabled = true;
   setAuthFeedback("Gerando seus dois links individuais...");
   document.getElementById("auth-link-actions").hidden = true;
+  document.getElementById("auth-link-actions").classList.remove("visible");
   try {
     const result = await api("/api/auth/request-verification", {
       method:"POST", body:JSON.stringify({email,password})
@@ -93,6 +94,7 @@ document.getElementById("auth-request").addEventListener("click", async () => {
     document.getElementById("auth-whatsapp-link").href = result.whatsappUrl;
     document.getElementById("auth-email-link").href = result.emailUrl;
     document.getElementById("auth-link-actions").hidden = false;
+    document.getElementById("auth-link-actions").classList.add("visible");
     setAuthFeedback("Os dois links foram gerados. Se algum aplicativo não abriu, use os links abaixo. Toque em Enviar dentro de cada aplicativo. O primeiro link confirmado libera o acesso e invalida o outro.");
   } catch (error) {
     if (whatsappWindow) whatsappWindow.close();
