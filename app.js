@@ -2,15 +2,116 @@ const views = [...document.querySelectorAll(".view")];
 const navItems = [...document.querySelectorAll(".nav-item")];
 const titles = {overview:"Visão geral",phishing:"Análise de phishing",web:"Segurança web",awareness:"Conscientização",reports:"Relatórios"};
 const API_BASE = "https://cybersecurity-phishing-study-lab.onrender.com";
-const studentIdKey = "cyberlab-student-id";
-let studentId = localStorage.getItem(studentIdKey);
-if (!studentId) {
-  studentId = crypto.randomUUID();
-  localStorage.setItem(studentIdKey, studentId);
-}
+const AUTH_KEY = "cyberlab-session-token";
+let authToken = sessionStorage.getItem(AUTH_KEY) || "";
 let completed = [];
-try { completed = JSON.parse(localStorage.getItem("cyberlab-progress") || "[]"); } catch { completed = []; }
-let syncTimer;
+let appStarted = false;
+
+function authHeaders(extra = {}) {
+  return { ...extra, ...(authToken ? { Authorization: "Bearer " + authToken } : {}) };
+}
+async function api(path, options = {}) {
+  const headers = authHeaders(options.headers || {});
+  if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
+  const response = await fetch(API_BASE + path, { ...options, headers });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "Não foi possível concluir a operação.");
+  return data;
+}
+function setAuthFeedback(message, isError = false) {
+  const node = document.getElementById("auth-feedback");
+  node.textContent = message;
+  node.classList.toggle("error", isError);
+}
+function unlockApp(email) {
+  document.body.classList.add("authenticated");
+  document.getElementById("auth-gate").hidden = true;
+  document.getElementById("signed-in-email").textContent = email || "Estudante";
+  if (!appStarted) {
+    appStarted = true;
+    updateProgress();
+    syncFromServer();
+  }
+}
+function lockApp() {
+  document.body.classList.remove("authenticated");
+  document.getElementById("auth-gate").hidden = false;
+  appStarted = false;
+}
+async function checkExistingSession() {
+  if (!authToken) return lockApp();
+  try {
+    const result = await api("/api/auth/me");
+    unlockApp(result.user.email);
+  } catch {
+    authToken = "";
+    sessionStorage.removeItem(AUTH_KEY);
+    lockApp();
+  }
+}
+
+document.getElementById("auth-login").addEventListener("click", async () => {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  if (!email || !password) return setAuthFeedback("Informe seu e-mail e sua senha.", true);
+  const button = document.getElementById("auth-login");
+  button.disabled = true;
+  setAuthFeedback("Validando seu acesso...");
+  try {
+    const result = await api("/api/auth/login", { method:"POST", body:JSON.stringify({email,password}) });
+    authToken = result.token;
+    sessionStorage.setItem(AUTH_KEY, authToken);
+    document.getElementById("auth-password").value = "";
+    setAuthFeedback("");
+    unlockApp(result.user.email);
+  } catch (error) {
+    setAuthFeedback(error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById("auth-request").addEventListener("click", async () => {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  if (!email || !password) return setAuthFeedback("Informe seu e-mail autorizado e crie uma senha com pelo menos 10 caracteres.", true);
+  if (password.length < 10) return setAuthFeedback("A senha precisa ter pelo menos 10 caracteres.", true);
+
+  // Open both destinations during the user's click gesture to reduce mobile popup blocking.
+  const whatsappWindow = window.open("about:blank", "_blank");
+  const emailWindow = window.open("about:blank", "_blank");
+  const button = document.getElementById("auth-request");
+  button.disabled = true;
+  setAuthFeedback("Gerando seus dois links individuais...");
+  document.getElementById("auth-link-actions").hidden = true;
+  try {
+    const result = await api("/api/auth/request-verification", {
+      method:"POST", body:JSON.stringify({email,password})
+    });
+    if (whatsappWindow) whatsappWindow.location.href = result.whatsappUrl;
+    if (emailWindow) emailWindow.location.href = result.emailUrl;
+    document.getElementById("auth-whatsapp-link").href = result.whatsappUrl;
+    document.getElementById("auth-email-link").href = result.emailUrl;
+    document.getElementById("auth-link-actions").hidden = false;
+    setAuthFeedback("Os dois links foram gerados. Se algum aplicativo não abriu, use os links abaixo. Toque em Enviar dentro de cada aplicativo. O primeiro link confirmado libera o acesso e invalida o outro.");
+  } catch (error) {
+    if (whatsappWindow) whatsappWindow.close();
+    if (emailWindow) emailWindow.close();
+    setAuthFeedback(error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById("auth-logout").addEventListener("click", async () => {
+  try { await api("/api/auth/logout", { method:"POST" }); } catch {}
+  authToken = "";
+  sessionStorage.removeItem(AUTH_KEY);
+  completed = [];
+  lockApp();
+  setAuthFeedback("Você saiu do Security Lab.");
+});
+
 function updateProgress() {
   const value = Math.round(completed.length / 2 * 100);
   document.getElementById("progress-number").textContent = Math.min(value, 100) + "%";
@@ -21,31 +122,26 @@ function setSyncStatus(message) {
 }
 async function syncFromServer() {
   try {
-    const response = await fetch(`${API_BASE}/api/progress?studentId=${encodeURIComponent(studentId)}`);
-    if (!response.ok) throw new Error("Falha ao carregar");
-    const data = await response.json();
+    const data = await api("/api/progress");
     completed = Array.isArray(data.completedModules) ? data.completedModules : [];
-    localStorage.setItem("cyberlab-progress", JSON.stringify(completed));
     updateProgress();
-    setSyncStatus("Progresso sincronizado com o banco de dados.");
-  } catch {
-    setSyncStatus("API indisponível no momento. O progresso fica temporariamente neste navegador.");
+    setSyncStatus("Progresso sincronizado com sua conta.");
+  } catch (error) {
+    setSyncStatus(error.message === "Faça login para continuar." ? "Entre novamente para sincronizar." : "Não foi possível sincronizar agora.");
   }
 }
 async function saveProgress() {
-  localStorage.setItem("cyberlab-progress", JSON.stringify(completed));
   updateProgress();
   setSyncStatus("Salvando progresso...");
   try {
-    const response = await fetch(`${API_BASE}/api/progress`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentId, completedModules: completed })
+    const data = await api("/api/progress", {
+      method:"PUT",
+      body:JSON.stringify({completedModules:completed})
     });
-    if (!response.ok) throw new Error("Falha ao salvar");
+    completed = Array.isArray(data.completedModules) ? data.completedModules : completed;
     setSyncStatus("Progresso salvo no banco de dados.");
-  } catch {
-    setSyncStatus("Sem conexão com a API. O progresso permanece salvo neste navegador.");
+  } catch (error) {
+    setSyncStatus(error.message);
   }
 }
 function markCompleted(moduleName) {
@@ -76,5 +172,4 @@ document.querySelectorAll(".scenario-option").forEach(b => b.addEventListener("c
   feedback.textContent = correct ? "Boa decisão! Use sempre canais oficiais que você já conhece." : "Não é a opção mais segura. Evite links inesperados e procure o canal oficial.";
   if (correct) markCompleted("awareness");
 }));
-updateProgress();
-syncFromServer();
+checkExistingSession();
