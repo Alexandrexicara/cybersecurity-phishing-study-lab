@@ -386,4 +386,20 @@ app.get("/api/reports", requireAuth, async (req, res) => {
   }
 });
 
-app.listen(port, "0.0.0.0", () => console.log("Security Lab API listening on " + port));
+pool.query(`
+  CREATE TABLE IF NOT EXISTS security_lab_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES security_lab_users(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    details JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+  CREATE INDEX IF NOT EXISTS security_lab_reports_user_created_idx
+    ON security_lab_reports(user_id, created_at DESC);
+`).then(() => {
+  app.listen(port, "0.0.0.0", () => console.log("Security Lab API listening on " + port));
+}).catch(error => {
+  console.error("Security Lab reports schema initialization failed:", error.message);
+  process.exit(1);
+});
