@@ -16,7 +16,7 @@
 .auth-buttons button:disabled{opacity:.55;cursor:wait}
 .auth-feedback{min-height:22px;color:var(--cyan);font-size:12px;line-height:1.6;margin:16px 0 0}
 .auth-feedback.error{color:#ff9b9b}
-.auth-link-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.auth-link-actions{display:none;flex-wrap:wrap;gap:12px;margin-top:12px}.auth-link-actions.visible{display:flex}
 .auth-link-actions[hidden]{display:none}
 .auth-link-actions a{color:var(--cyan);font-size:13px;font-weight:800}
 .auth-note{font-size:11px;margin:18px 0 0}
