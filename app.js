@@ -214,6 +214,7 @@ if (runUrlCheck) runUrlCheck.addEventListener("click", () => {
     resultNode.append(heading,domain,list,disclaimer);
     resultNode.hidden = false;
     feedback.textContent = "Análise concluída no navegador.";
+    api("/api/reports",{method:"POST",body:JSON.stringify({kind:"url-analysis",title:"Análise de URL: "+result.host,details:result})}).catch(error=>{feedback.textContent += " Relatório não salvo: "+error.message;});
   } catch(error) {
     resultNode.hidden = true;
     feedback.textContent = error.message;
@@ -224,6 +225,45 @@ if (clearUrlCheck) clearUrlCheck.addEventListener("click", () => {
   document.getElementById("url-to-check").value = "";
   document.getElementById("url-check-result").hidden = true;
   document.getElementById("url-check-feedback").textContent = "";
+});
+
+
+const runDomainCheck = document.getElementById("run-domain-check");
+if (runDomainCheck) runDomainCheck.addEventListener("click", async () => {
+  const feedback = document.getElementById("domain-check-feedback");
+  const resultNode = document.getElementById("domain-check-result");
+  runDomainCheck.disabled = true;
+  feedback.textContent = "Consultando DNS...";
+  resultNode.hidden = true;
+  try {
+    const data = await api("/api/tools/domain-check", {method:"POST",body:JSON.stringify({domain:document.getElementById("domain-to-check").value})});
+    resultNode.replaceChildren();
+    const heading=document.createElement("h3"); heading.textContent=data.resolved?"Domínio resolvido":"Sem resolução DNS";
+    const domain=document.createElement("p"); domain.textContent="Domínio: "+data.domain;
+    const list=document.createElement("ul");
+    (data.addresses.length?data.addresses:data.warnings).forEach(value=>{const li=document.createElement("li");li.textContent=value;list.append(li);});
+    const note=document.createElement("p");note.className="muted";note.textContent=data.note;
+    resultNode.append(heading,domain,list,note); resultNode.hidden=false;
+    feedback.textContent="Consulta concluída.";
+    await api("/api/reports",{method:"POST",body:JSON.stringify({kind:"dns-check",title:"Consulta DNS: "+data.domain,details:data})});
+  } catch(error) { feedback.textContent=error.message; }
+  finally { runDomainCheck.disabled=false; }
+});
+const loadReports = document.getElementById("load-security-reports");
+if (loadReports) loadReports.addEventListener("click", async () => {
+  const list=document.getElementById("security-reports-list");
+  list.replaceChildren();
+  try {
+    const data=await api("/api/reports");
+    if(!data.reports.length){const p=document.createElement("p");p.textContent="Nenhum relatório salvo ainda.";list.append(p);return;}
+    data.reports.forEach(report=>{
+      const item=document.createElement("article");
+      const title=document.createElement("b");title.textContent=report.title;
+      const date=document.createElement("p");date.textContent=new Date(report.created_at).toLocaleString("pt-BR");
+      const kind=document.createElement("p");kind.textContent="Tipo: "+report.kind;
+      item.append(title,date,kind);list.append(item);
+    });
+  } catch(error) { const p=document.createElement("p");p.textContent=error.message;list.append(p); }
 });
 
 checkExistingSession();
