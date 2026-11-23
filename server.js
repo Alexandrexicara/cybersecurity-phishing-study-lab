@@ -135,27 +135,34 @@ app.post("/api/auth/request-verification", async (req, res) => {
   try {
     client = await pool.connect();
     await client.query("BEGIN");
-    const existing = await client.query("SELECT id FROM security_lab_users WHERE email = $1 FOR UPDATE", [email]);
+    const existing = await client.query(
+      "SELECT id, password_hash, email_verified_at, phone_verified_at FROM security_lab_users WHERE email = $1 FOR UPDATE",
+      [email]
+    );
     let userId;
     if (existing.rowCount) {
-      userId = existing.rows[0].id;
-      const active = await client.query(
-        "SELECT id FROM security_lab_verification_batches WHERE user_id = $1 AND completed_at IS NULL AND expires_at > NOW() LIMIT 1",
+      const user = existing.rows[0];
+      if (user.email_verified_at || user.phone_verified_at) {
+        await client.query("ROLLBACK");
+        return res.status(409).json({ error: "Esta conta já foi autorizada. Entre com sua senha." });
+      }
+      if (!(await verifyPassword(password, user.password_hash))) {
+        await client.query("ROLLBACK");
+        return res.status(401).json({ error: "A senha não corresponde à conta criada anteriormente." });
+      }
+      userId = user.id;
+      await client.query(
+        "UPDATE security_lab_verification_batches SET expires_at = NOW(), completed_at = NOW() WHERE user_id = $1 AND completed_at IS NULL",
         [userId]
       );
-      if (active.rowCount) {
-        await client.query("ROLLBACK");
-        return res.status(409).json({ error: "Já existe uma autorização pendente. Use os links que já foram gerados." });
-      }
-      await client.query("ROLLBACK");
-      return res.status(409).json({ error: "A conta já existe. Entre com sua senha." });
+    } else {
+      const encodedPassword = await passwordHash(password);
+      const inserted = await client.query(
+        "INSERT INTO security_lab_users (email, phone_e164, password_hash) VALUES ($1, $2, $3) RETURNING id",
+        [email, "+" + allowedPhone, encodedPassword]
+      );
+      userId = inserted.rows[0].id;
     }
-    const encodedPassword = await passwordHash(password);
-    const inserted = await client.query(
-      "INSERT INTO security_lab_users (email, phone_e164, password_hash) VALUES ($1, $2, $3) RETURNING id",
-      [email, "+" + allowedPhone, encodedPassword]
-    );
-    userId = inserted.rows[0].id;
     const batch = await client.query(
       "INSERT INTO security_lab_verification_batches (user_id, expires_at) VALUES ($1, NOW() + INTERVAL '30 minutes') RETURNING id",
       [userId]
