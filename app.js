@@ -178,9 +178,9 @@ document.querySelectorAll(".scenario-option").forEach(b => b.addEventListener("c
 function analyzeUrl(raw) {
   const input = String(raw || "").trim();
   if (!input) throw new Error("Informe um endereço para analisar.");
-  if (/\\s/.test(input)) throw new Error("O endereço contém espaços. Confira e tente novamente.");
+  if (/\s/.test(input)) throw new Error("O endereço contém espaços. Confira e tente novamente.");
   let parsed;
-  try { parsed = new URL(/^[a-z][a-z0-9+.-]*:\\/\\//i.test(input) ? input : "https://" + input); }
+  try { parsed = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(input) ? input : "https://" + input); }
   catch { throw new Error("Não foi possível interpretar esse endereço. Confira o formato."); }
   if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("Somente endereços HTTP ou HTTPS podem ser analisados.");
   const host = parsed.hostname.toLowerCase();
@@ -188,13 +188,12 @@ function analyzeUrl(raw) {
   if (parsed.protocol !== "https:") flags.push("Conexão sem HTTPS: os dados não têm proteção TLS durante o transporte.");
   if (parsed.username || parsed.password) flags.push("O endereço contém usuário ou senha antes do domínio, um artifício frequentemente usado para confundir.");
   if (host.startsWith("xn--") || host.split(".").some(part => part.startsWith("xn--"))) flags.push("O domínio usa codificação Punycode; confira se há caracteres visualmente parecidos.");
-  if (/^(\\d{1,3}\\.){3}\\d{1,3}$/.test(host) || host.includes(":")) flags.push("O destino usa endereço IP em vez de um nome de domínio comum.");
+  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(host) || host.includes(":")) flags.push("O destino usa endereço IP em vez de um nome de domínio comum.");
   if (host.split(".").length > 4) flags.push("O domínio possui muitos subdomínios; confirme qual é o domínio registrável.");
   if (/(login|signin|verify|secure|account|update|password|wallet|support)/i.test(parsed.pathname + parsed.search)) flags.push("O caminho contém termos frequentemente usados em páginas de autenticação ou verificação. Isso, sozinho, não prova fraude.");
-  if (/(bit\\.ly|tinyurl\\.com|t\\.co|is\\.gd|cutt\\.ly)/i.test(host)) flags.push("O domínio parece ser um encurtador; o destino final não foi verificado.");
+  if (/(bit\.ly|tinyurl\.com|t\.co|is\.gd|cutt\.ly)/i.test(host)) flags.push("O domínio parece ser um encurtador; o destino final não foi verificado.");
   if (host.length > 45) flags.push("O nome do host é longo; confira cuidadosamente a grafia.");
-  const suspiciousTld = /\\.(zip|mov|click|top|xyz|work|support)$/i.test(host);
-  if (suspiciousTld) flags.push("A extensão do domínio merece verificação adicional; extensões, isoladamente, não determinam fraude.");
+  if (/\.(zip|mov|click|top|xyz|work|support)$/i.test(host)) flags.push("A extensão do domínio merece verificação adicional; extensões, isoladamente, não determinam fraude.");
   if (!flags.length) flags.push("Nenhum dos indicadores simples configurados foi encontrado. Isso não garante que o endereço seja legítimo.");
   const high = flags.some(x => /usuário ou senha|Punycode|encurtador|endereço IP/i.test(x));
   const medium = flags.length >= 2 || parsed.protocol !== "https:";
